@@ -5,18 +5,30 @@ const io = require("socket.io")(server, {
         origin: 'http://localhost:8080'
     }
 })
+const expressLayouts = require('express-ejs-layouts')
+
+// SETUP EJS
+app.set('view engine', 'ejs')
+app.use(expressLayouts)
 
 app.get('/', (req,res) => {
-    res.sendFile(__dirname + '/index.html')
+    res.render('index', {
+        title: 'CHAT BARENG YUK',
+        layout: 'layout/main'
+    })
 })
 
 io.on('connection', (socket) => {
     console.log('coneting')
-    socket.on('send-content', (data) => {
-        socket.broadcast.emit('get-content', data)
+    socket.on('disconnect', () => {
+        console.log('disconnect')
+    })
+    socket.on('chat-message', msg => {
+        console.log(`message: ${msg}`)
     })
 })
 
-server.listen(3000, () => {
-    console.log('listening on localhost:3000');
+const port = 8000
+server.listen(port, () => {
+    console.log('listening on localhost:%s', port);
 })
